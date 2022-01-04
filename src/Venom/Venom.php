@@ -25,13 +25,29 @@ class Venom
     private array $controllers = [];
     private array $modules = [];
     private array $routers = [];
+    private static ?self $instance = null;
 
-    public function __construct()
+    public static function get(): Venom
+    {
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    private function __construct()
     {
         ExceptionHandler::setExceptionHandler();
         $this->renderer = new VenomRenderer($this);
         $this->routers[Router::ADMIN_ROUTER] = new Router(Router::ADMIN_ROUTER, 1.0, '/admin/api');
         Asset::get()->setRenderer($this->renderer);
+    }
+
+    public static function makeDefaultRouter(string $path = ''): Router
+    {
+        $router = new Router(Router::DEFAULT_ROUTER, 1.0, $path);
+        Venom::get()->addRouter($router);
+        return $router;
     }
 
     public function inject(): void
@@ -43,7 +59,7 @@ class Venom
     {
         $arguments = ArgumentHandler::get();
         $arguments->setItem(ErrorHandler::ERROR_KEY, false);
-        $config = Config::getInstance();
+        $config = Config::get();
         if ($config->isAdmin()) {
             $this->initAdmin();
         }
@@ -71,14 +87,14 @@ class Venom
     public function initAdmin(): void
     {
         $this->controllers['adminCtrl'] = AdminController::class;
-        AdminRouterInit::registerAdminRouters($this);
+        AdminRouterInit::registerAdminModule($this);
         ArgumentHandler::get()->setItem('cl', 'adminCtrl');
     }
 
     private function useRouter(): array
     {
         $url = URLHelper::getInstance()->getUrl();
-        $isAdmin = Config::getInstance()->isAdmin();
+        $isAdmin = Config::get()->isAdmin();
         /** @var Router $router */
         foreach ($this->routers as $key => $router) {
             if ($isAdmin && $key !== Router::ADMIN_ROUTER) {
@@ -116,7 +132,7 @@ class Venom
 
     public function initModules(array $modules): void
     {
-        if (Config::getInstance()->isAdmin()) {
+        if (Config::get()->isAdmin()) {
             $modules = array_merge(ModuleLoader::getModules(), $modules);
         }
         foreach ($modules as $module) {

@@ -3,6 +3,8 @@
 
 namespace Venom\Core;
 
+use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
 use Venom\Helper\TemplateUtil;
 use Venom\Routing\Route;
@@ -14,12 +16,7 @@ class ModuleLoader
     public static function getModules(): array
     {
         return [
-            'Meta',
             'User',
-            'Data',
-            'Role',
-            'SEO',
-            'VenomStatus',
         ];
     }
 
@@ -39,7 +36,7 @@ class ModuleLoader
             return false;
         }
         // register Router, Templates and more :)
-        $isAdmin = Config::getInstance()->isAdmin();
+        $isAdmin = Config::get()->isAdmin();
         if ($isAdmin) {
             self::registerRoutes($module,
                 $venom,
@@ -61,12 +58,72 @@ class ModuleLoader
 
     public static function registerRoutes(array $module, Venom $venom, array $routes, Router $router)
     {
-        foreach ($routes as $key => $route) {
-            /** @var Route $route */
-            $route->module = $module[Module::NAME];
-            $route->isSecure = $module[Module::SECURE];
-            $route->venom = $venom;
-            $router->addRoute($key, $route);
+        $cacheKey = $module[Module::NAME] . "__route__cache.cache";
+        $cache = CacheHandler::get($cacheKey) ?? [];
+        $changed = false;
+        foreach ($routes as $route) {
+            if (isset($cache[$route])) {
+                self::createFromCache($route, $cache, $module, $venom);
+            } else {
+                try {
+                    self::createFromReflection($route, $cache, $module, $venom);
+                    $changed = true;
+                } catch (ReflectionException $e) {
+                    trigger_error("Error in Reflection");
+                    continue;
+                }
+            }
+        }
+        if ($changed) {
+            CacheHandler::put($cacheKey, $cache);
+        }
+    }
+
+    private static function createFromCache(string $route, array &$cacheData, array $module, Venom $venom): void
+    {
+        $data = $cacheData[$route];
+        if ($data === 'from-function') {
+            $createdRoute = Route::create($route, []);
+            if ($createdRoute !== null) {
+                $createdRoute->isSecure = $module[Module::SECURE];
+                $createdRoute->module = $module[Module::NAME];
+                $createdRoute->venom = $venom;
+            }
+        } else {
+            foreach ($data as $method => $routeData) {
+                $createdRoute = Route::create($route, $routeData['args'], $routeData['parameters'], $method);
+                $createdRoute->isSecure = $module[Module::SECURE];
+                $createdRoute->module = $module[Module::NAME];
+                $createdRoute->venom = $venom;
+            }
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private static function createFromReflection(string $route, array &$cacheData, array $module, Venom $venom): void
+    {
+        $class = new ReflectionClass($route);
+        $classAttributes = $class->getAttributes(Route::class);
+        if (count($classAttributes) > 0) {
+            $route = Route::create($route, []);
+            $cacheData[$route] = 'from-function';
+        } else {
+            $methods = $class->getMethods();
+            foreach ($methods as $method) {
+                $attributes = $method->getAttributes(Route::class);
+                if (count($attributes) === 0) continue;
+                $attribute = $attributes[0];
+                $createdRoute = Route::create($route, $attribute->getArguments(), count($method->getParameters()), $method->getShortName());
+                $cacheData[$route][$method->getShortName()] = [
+                    'args' => $attribute->getArguments(),
+                    'parameters' => count($method->getParameters())
+                ];
+                $createdRoute->isSecure = $module[Module::SECURE];
+                $createdRoute->module = $module[Module::NAME];
+                $createdRoute->venom = $venom;
+            }
         }
     }
 }

@@ -16,20 +16,7 @@ $venom->registerModule([
     // NEED TO CHECK RIGHTS? :D IF FALSE WRITE IS ALWAYS ALLOWED ALSO READ!
     Module::SECURE => true,
     Module::ROUTE => [],
-    Module::ADMIN_ROUTE => [
-        '/users' => new Route(UserAPIController::class, [
-                "*" => [
-                    Route::GET => 'get'
-                ],
-                "1" => [
-                    Route::GET => 'getById',
-                    Route::POST => 'insert',
-                    Route::PUT => 'update',
-                    Route::DELETE => 'delete'
-                ]
-            ]
-        )
-    ],
+    Module::ADMIN_ROUTE => [],
     Module::TEMPLATE_PATH => __DIR__ . "/tpl/",
     Module::TEMPLATES => [
     ],

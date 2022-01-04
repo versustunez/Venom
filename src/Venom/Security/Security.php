@@ -38,7 +38,7 @@ class Security
         if ($this->user->isLoaded()) {
             throw new RuntimeException('Try to re-login!');
         }
-        $sec = Config::getInstance()->getSecurity();
+        $sec = Config::get()->getSecurity();
         $login = new $sec->securityClass($this->user);
         if ($login instanceof Login) {
             if (!$login->checkCredentials() || !$login->login()) {
@@ -52,5 +52,10 @@ class Security
     {
         unset($_SESSION['userID']);
         $this->user = new User();
+    }
+
+    public function getUsername(): string
+    {
+        return $this->user->username;
     }
 }

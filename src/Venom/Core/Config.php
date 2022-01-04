@@ -10,7 +10,6 @@ class Config
     private static ?Config $instance = null;
     private bool $isWriteable = true;
     private float $version = 1.0;
-    private ConfigObject $mail;
     private ConfigObject $renderer;
     private ConfigObject $security;
     private bool $maintenance = false;
@@ -27,7 +26,7 @@ class Config
         $this->security = new ConfigObject();
     }
 
-    public static function getInstance(): Config
+    public static function get(): Config
     {
         if (self::$instance === null) {
             self::$instance = new Config();
@@ -75,16 +74,6 @@ class Config
     public function setVersion(float $param): void
     {
         $this->set('version', $param);
-    }
-
-    public function getMail(): ConfigObject
-    {
-        return $this->mail;
-    }
-
-    public function setMail(array $array): void
-    {
-        $this->set('mail', $array);
     }
 
     public function getRenderer(): ConfigObject

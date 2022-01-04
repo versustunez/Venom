@@ -41,7 +41,7 @@ class BaseLogin implements Login
 
     public function login(): bool
     {
-        $sec = Config::getInstance()->getSecurity();
+        $sec = Config::get()->getSecurity();
         $this->user->username = (string)ArgumentHandler::get()->getPostItem('USERNAME');
         if (!$this->user->loadUser()) {
             return false;

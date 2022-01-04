@@ -28,7 +28,7 @@ class Router
         $this->routes = array_merge($this->routes, $routes);
     }
 
-    public function addRoute(string $path, Route $route): void
+    public function addRoute(string $path, IRoute $route): void
     {
         $this->routes[$path] = $route;
     }
@@ -66,7 +66,7 @@ class Router
     private function getRouteByName($url, $method, $subRoute = '*', $params = []): ?array
     {
         if (isset($this->routes[$url])) {
-            /** @var Route $route */
+            /** @var IRoute $route */
             $route = $this->routes[$url];
             $sub = $route->getDefinitions($method, $subRoute);
             if ($sub === null) {
@@ -125,5 +125,13 @@ class Router
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getOrCreate(?string $url, string $class = ''): ?IRoute
+    {
+        if (!isset($this->routes[$url])) {
+            $this->routes[$url] = new IRoute($class, [], true);
+        }
+        return $this->routes[$url];
     }
 }

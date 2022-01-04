@@ -18,7 +18,7 @@ class SeoController
 
     public function __construct()
     {
-        $this->shouldUse = Config::getInstance()->getSeoEnabled();
+        $this->shouldUse = Config::get()->getSeoEnabled();
     }
 
     public function loadSite(): void

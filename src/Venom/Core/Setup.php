@@ -10,7 +10,7 @@ class Setup
 {
     public static function loadConfig(bool $isAdmin): void
     {
-        $config = Config::getInstance();
+        $config = Config::get();
         $config->setIsAdmin($isAdmin);
         $file = self::tryLoading('config.inc.php', 'config.base.php', "Config");
         require $file;
@@ -39,12 +39,6 @@ class Setup
         if (isset($modules)) {
             $venom->initModules($modules);
         }
-    }
-
-    public static function loadRouters(Venom $venom): void
-    {
-        $file = self::tryLoading('routers.inc.php', 'router.base.php', "Routers");
-        require $file;
     }
 
     public static function loadLanguage(): void

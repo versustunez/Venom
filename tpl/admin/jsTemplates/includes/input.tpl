@@ -1,9 +1,0 @@
-<v-input
-    class="${classes}"
-    data-label="${label}"
-    required
-    name="${name}"
-    type="${type}"
-    data-error="${error}"
-    class="${class}">${default}
-</v-input>

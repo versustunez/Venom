@@ -13,15 +13,12 @@ use Venom\Core\Config;
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Venom Admin Interface</title>
     <?php Asset::get()->renderCSS(); ?>
-    <!--link rel="stylesheet" href="/theme/admin/css/admin-panel.css"-->
 </head>
-<body <?=Config::getInstance()->isDevMode() ? 'debug' : ''?>>
+<body <?=Config::get()->isDevMode() ? 'debug' : ''?>>
+<h1>Welcome to VenomCMS Admin</h1>
+<p>Current User: <strong><?=$this->getVar('current.user');?></strong></p>
 <?php
-if (!$this->getVar('isLoggedIn')) {
-    $this->renderTemplate('login');
-} else {
-    $this->renderTemplate('admin-panel');
-}
+
 Asset::get()->renderJS();
 ?>
 </body>

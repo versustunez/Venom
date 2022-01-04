@@ -87,7 +87,7 @@ class VenomRenderer
     public function init(?RenderController $controller): void
     {
         $this->controller = $controller;
-        if (!Config::getInstance()->isAdmin()) {
+        if (!Config::get()->isAdmin()) {
             $this->metaGenerator = new MetaGenerator();
             $this->metaGenerator->loadById();
         }

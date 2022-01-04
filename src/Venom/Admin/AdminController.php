@@ -29,17 +29,10 @@ class AdminController implements RenderController
             $this->tpl = 'async';
         }
 
-        $isLogin = Security::get()->hasPermission("admin", RoleEntity::TYPE_READ);
+        $security = Security::get();
+        $isLogin = $security->hasPermission("admin", RoleEntity::TYPE_READ);
+        $renderer->addVar('current.user', $security->getUsername());
         $renderer->addVar('isLoggedIn', $isLogin);
-        if (!$isLogin) {
-            Asset::get()->addCSS('login', 'login.css');
-        } else {
-            Asset::get()->addCSS('admin', 'admin-panel.css');
-        }
-        Asset::get()->addCSS('styles', 'style.css', 1);
-        Asset::get()->addJS('scripts', 'scripts.min.js', 1);
-        // Components are the Rendering-Pipeline to know how each Admin-Component needs to be rendered
-        Asset::get()->addJS('components', 'components.min.js', 5);
 
         return true;
     }

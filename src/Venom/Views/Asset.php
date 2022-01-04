@@ -43,7 +43,7 @@ class Asset
 
     public function getImagePath(string $filepath, bool $useAbsolute = false)
     {
-        $config = Config::getInstance();
+        $config = Config::get();
         $preDir = '/' . $config->getRenderer()->uploadDir;
         if ($useAbsolute) {
             $preDir = $config->getBaseUrl() . $preDir;
@@ -70,12 +70,12 @@ class Asset
 
     private function getPath($base): string
     {
-        $dir = Config::getInstance()->isAdmin() ? 'admin' : Config::getInstance()->getRenderer()->assetDir;
+        $dir = Config::get()->isAdmin() ? 'admin' : Config::get()->getRenderer()->assetDir;
         $preDir = '/theme/' . $dir . $base;
-        $config = Config::getInstance();
-        $baseUrl = Config::getInstance()->getBaseUrl();
+        $config = Config::get();
+        $baseUrl = Config::get()->getBaseUrl();
         if ($baseUrl !== '' && $config->getRenderer()->useStaticUrl) {
-            $preDir = Config::getInstance()->getBaseUrl() . $preDir;
+            $preDir = Config::get()->getBaseUrl() . $preDir;
         }
         return $preDir;
     }

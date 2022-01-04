@@ -1,14 +1,11 @@
 <?php
-
-
 namespace Venom\Routing;
 
-
-use RuntimeException;
-use Venom\Entities\RoleEntity;
-use Venom\Security\Security;
+use Attribute;
+use \RuntimeException;
 use Venom\Venom;
 
+#[Attribute(Attribute::TARGET_METHOD | Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 class Route
 {
     const GET = "GET";
@@ -16,35 +13,28 @@ class Route
     const PUT = "PUT";
     const DELETE = "DELETE";
 
-    public string $url;
-    public array $routes = [];
-    public int $maxParameters = 0;
-    public string $module = "unknown";
-    public bool $isSecure = false;
-    public Venom $venom;
-
-    public function __construct(public string $controller, array $config)
+    private function __construct(?string $url = null, ?string $method = self::GET, ?string $router = Router::DEFAULT_ROUTER)
     {
-        $count = count($config);
-        if ($count === 0) {
-            throw new RuntimeException("Route: \"$controller\" no valid Routes Found!");
-        }
-        $count -= isset($config["*"]) ? 1 : 0;
-        $this->maxParameters = $count;
-        $this->routes = $config;
     }
 
-    public function getDefinitions($method, mixed $subRoute): ?array
+    public static function create($routeClass, $arguments = [], $parameterCount = 0, $methodName = ''): ?IRoute
     {
-        if ($this->isSecure && !Security::get()->hasPermission($this->module, $method === Route::GET ? RoleEntity::TYPE_READ : RoleEntity::TYPE_WRITE)) {
+        if (count($arguments) === 0) {
+            if (method_exists($routeClass, '_getRoutes')) {
+                return new IRoute($routeClass, (new $routeClass())->_getRoutes());
+            }
             return null;
         }
-        if (isset($this->routes[$subRoute]) && isset($this->routes[$subRoute][$method])) {
-            return [
-                "cl" => $this->controller,
-                "fnc" => $this->routes[$subRoute][$method]
-            ];
+        $router = $arguments[2] ?? Router::DEFAULT_ROUTER;
+        $method = $arguments[1] ?? self::GET;
+        $url = $arguments[0];
+        $routerInstance = Venom::get()->getRouter($router);
+        if (!$routerInstance) {
+            throw new RuntimeException("Invalid Router: \"$router\" found");
         }
-        return null;
+        $route = $routerInstance->getOrCreate($url, $routeClass);
+        $key = $parameterCount == 0 ? '*' : $parameterCount;
+        $route->addRoute($key, $method, $methodName);
+        return $route;
     }
 }

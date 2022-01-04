@@ -24,7 +24,7 @@ $lang = $reg->getLang();
 </header>
 <main>
     <?php
-    $lang->getTranslation("TEST_TRANSLATION");
+    echo $lang->getTranslation("TEST_TRANSLATION");
     echo $this->templateData;
     ?>
 </main>

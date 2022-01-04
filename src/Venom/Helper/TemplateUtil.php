@@ -15,11 +15,11 @@ class TemplateUtil
 
     private function __construct()
     {
-        if (Config::getInstance()->isAdmin()) {
+        if (Config::get()->isAdmin()) {
             $base = 'base';
             $theme = 'admin';
         } else {
-            $data = Config::getInstance()->getRenderer();
+            $data = Config::get()->getRenderer();
             $theme = $data->theme;
             $base = $data->baseFile ?? 'base';
         }
