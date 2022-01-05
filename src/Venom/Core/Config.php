@@ -21,7 +21,6 @@ class Config
 
     private function __construct()
     {
-        $this->mail = new ConfigObject();
         $this->renderer = new ConfigObject();
         $this->security = new ConfigObject();
     }

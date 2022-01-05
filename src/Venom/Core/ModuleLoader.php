@@ -23,7 +23,7 @@ class ModuleLoader
     public static function loadModule(string $name, Venom $venom)
     {
         // load module search in the Module Path for a module.php file
-        $dir = __DIR__ . "/../../modules/" . $name . "/module.php";
+        $dir = __DIR__ . "/../../Modules/" . $name . "/module.php";
         if (!file_exists($dir)) {
             throw new RuntimeException("Module File: \"$dir\" Not found");
         }

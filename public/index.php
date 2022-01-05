@@ -5,7 +5,7 @@ use Venom\Core\Setup;
 use Venom\Helper\URLHelper;
 use Venom\Venom;
 
-require_once '../vendor/autoload.php';
+require_once '../bootstrap.php';
 session_start();
 Setup::loadConfig(URLHelper::getInstance()->isAdminUrl());
 Setup::loadLanguage();

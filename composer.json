@@ -7,23 +7,17 @@
       "name": "Maurice Grönwoldt",
       "email": "mauricegroenwoldt@gmail.com",
       "role": "founder"
-    },
-    {
-      "name": "Dominic Seela",
-      "email": "kontakt@engineertrooper.com",
-      "role": "friendly developer, supporter"
     }
   ],
   "require": {
     "ext-pdo": "*",
-    "ext-http": "*",
     "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
       "Venom\\": "./src/Venom/",
-      "Modules\\": "./src/modules/",
-      "Controllers\\": "./src/controllers/"
+      "Modules\\": "./src/Modules/",
+      "Controllers\\": "./src/Controllers/"
     }
   }
 }
