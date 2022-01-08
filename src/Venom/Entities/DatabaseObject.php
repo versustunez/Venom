@@ -14,6 +14,10 @@ class DatabaseObject extends Entity
 {
     private array $data = [];
 
+    public function getFieldsToWrite(): array {
+        return $this->data;
+    }
+
     public function __get($name)
     {
         if (isset($this->data[$name])) {
