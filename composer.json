@@ -19,5 +19,8 @@
       "Modules\\": "./src/Modules/",
       "Controllers\\": "./src/Controllers/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "9.5"
   }
 }
